@@ -1,0 +1,11 @@
+doctype html
+html(lang="ko")
+	head
+		title=`도서정보: ${bookName}`
+		meta(charset="utf-8")
+		link(href="/css/bootstrap.min.css", rel="stylesheet")
+		link(href="/css/bootstrap.base.css", rel="stylesheet")
+	body
+		div.container
+			h1.jumbotron PUG를 활용한 웹페이지 입니다
+				small.ml-3=bookName

@@ -10,9 +10,11 @@ app.listen(port, () => {
 
 // Routing 작업
 // 정적 페이지 처리
+app.set("view engine", "pug");  // pug를 view template engine 으로 지정
+app.set("views", "./views");    // pug 파일이 존재하는 폴더를 지정
 app.use("/", express.static('./public/'));
 app.use(bodyParser.urlencoded({extended: false}));
-
+app.locals.pretty = true; // res tag가 줄맞춤 되어 보이게 함
 
 app.get("/test", (req, res) => {
   res.send(`<h1>Hello Node.js</h1>`);
@@ -57,3 +59,23 @@ app.post("/test_input", (req, res) => {
 
 
 // 동적페이지 - get - sementic방식
+app.get(["/book", "/book/:id"], (req, res) => {
+  var books = [
+    {id: 1, bookName: "홍길동전", desc: "아버지를 아버지라..."},
+    {id: 2, bookName: "별주부전", desc: "용왕이 나의 간을..."},
+    {id: 3, bookName: "구운몽전", desc: "한 여름밤의 꿈..."}
+  ];
+  // req.query.id   -> get /book?id=1
+  // req.body.id    -> post /book id=1
+  // req.params.id  -> get /book/1
+  var id = req.params.id;
+  var vals = {
+    bookName: books[id].bookName
+  };
+  res.render("sample", vals);
+});
+
+// view engine - gen coding (emmet)
+// jade -> pug, ejs(jsp), jsx(react)
+
+
