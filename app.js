@@ -2,6 +2,7 @@ const port = 8000;
 // node modules 또는 우리가 만든 js 파일: Module
 const express = require('express'); // express 모듈을 요청
 const app = express();  // express 실행
+const bodyParser = require('body-parser');
 
 app.listen(port, () => {
   console.log("connected " + port);
@@ -10,6 +11,7 @@ app.listen(port, () => {
 // Routing 작업
 // 정적 페이지 처리
 app.use("/", express.static('./public/'));
+app.use(bodyParser.urlencoded({extended: false}));
 
 
 app.get("/test", (req, res) => {
@@ -17,7 +19,7 @@ app.get("/test", (req, res) => {
 });
 
 
-// 동적페이지
+// 동적페이지 - get - query방식
 app.get("/test2", (req, res) => {
   var books = [
     {id: 1, bookName: "홍길동전", desc: "아버지를 아버지라..."},
@@ -45,3 +47,13 @@ app.get("/test2", (req, res) => {
   </html>`;
   res.send(html);
 });
+
+// 동적페이지 - post - bodyParser가 필요함
+app.post("/test_input", (req, res) => {
+  var bookName = req.body.bookName;
+  // 데이터베이스 저장
+  res.send(`${bookName}이(가) 잘 저장되었습니다.`);
+});
+
+
+// 동적페이지 - get - sementic방식
