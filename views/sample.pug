@@ -9,3 +9,21 @@ html(lang="ko")
 		div.container
 			h1.jumbotron PUG를 활용한 웹페이지 입니다
 				small.ml-3=bookName
+			ul.my-5.border.border-dark
+				each v in sample
+					li.p-3.border-bottom= v
+			.my-3.border.rounded
+				- var user = { descriptions: 'foo bar baz' }
+				- var authorised = true
+				#user
+					if user.description
+						h2.green Description
+						p.description= user.description
+					else if authorised
+						h2.blue Description
+						p.description.
+							User has no description,
+							why not add one...
+					else
+						h2.red Description
+						p.description User has no description

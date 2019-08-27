@@ -2,22 +2,31 @@ const port = 8000;
 // node modules 또는 우리가 만든 js 파일: Module
 const express = require('express'); // express 모듈을 요청
 const app = express();  // express 실행
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');  // post방식의 요청시 body를 해석하는 모듈
 
+// 서버를 실행한다.
 app.listen(port, () => {
   console.log("connected " + port);
+  console.log("http://localhost:8000");
 });
 
-// Routing 작업
-// 정적 페이지 처리
+// 정적 페이지 처리 및 초기 셋팅
 app.set("view engine", "pug");  // pug를 view template engine 으로 지정
 app.set("views", "./views");    // pug 파일이 존재하는 폴더를 지정
-app.use("/", express.static('./public/'));
+app.use("/", express.static('./public/'));   // 정적 html 파일 루트 지정
 app.use(bodyParser.urlencoded({extended: false}));
 app.locals.pretty = true; // res tag가 줄맞춤 되어 보이게 함
 
+
+// Routing 작업
 app.get("/test", (req, res) => {
-  res.send(`<h1>Hello Node.js</h1>`);
+  id = req.query.id;
+  // 조건 ? 참일때 : 거짓일때 - 삼항조건문
+  id ? res.send(`<h1>Hello Node.js</h1>`) : res.send(`<h1 style="color: red;">Require [id]</h1>`);
+  /*
+  if(id == "0") res.send(`<h1>Hello Node.js</h1>`);
+  else res.send(`<h1 style="color: red;">Require [id]</h1>`);
+  */
 });
 
 
@@ -70,7 +79,8 @@ app.get(["/book", "/book/:id"], (req, res) => {
   // req.params.id  -> get /book/1
   var id = req.params.id;
   var vals = {
-    bookName: books[id].bookName
+    bookName: books[id].bookName,
+    sample: ["one", "two", "three", "four"]
   };
   res.render("sample", vals);
 });
@@ -78,4 +88,10 @@ app.get(["/book", "/book/:id"], (req, res) => {
 // view engine - gen coding (emmet)
 // jade -> pug, ejs(jsp), jsx(react)
 
-
+app.get("/include", (req, res) => {
+  var sendValues = {
+    docTitle: "Include 샘플페이지",
+    cssName: "include"
+  }
+  res.render("include", sendValues);
+});
