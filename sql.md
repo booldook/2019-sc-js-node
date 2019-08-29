@@ -5,3 +5,8 @@
 ```sql
 INSERT INTO sample SET comment='테스트 입니다', wdate='2019-08-27 21:51:10'
 ```
+
+2. Delete
+```sql
+DELETE FROM sample WHERE id=3
+```
