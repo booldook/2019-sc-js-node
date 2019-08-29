@@ -3,6 +3,7 @@ const port = 8000;
 const express = require('express'); // express 모듈을 요청
 const app = express();  // express 실행
 const bodyParser = require('body-parser');  // post방식의 요청시 body를 해석하는 모듈
+const db = require("./modules/mysql_conn");
 
 // 서버를 실행한다.
 app.listen(port, () => {
@@ -94,4 +95,63 @@ app.get("/include", (req, res) => {
     cssName: "include"
   }
   res.render("include", sendValues);
+});
+
+app.post("/board_save", (req, res) => {
+  var comment = req.body.comment;
+  var sql = "INSERT INTO sample SET comment=?, wdate=?";
+  var d = new Date();
+  var values = [comment, d];
+  db.conn.getConnection((err, connect) => {
+    if(err) res.send("접속이 실패했습니다.")
+    else {
+      connect.query(sql, values, (err, result) => {
+        if(err) res.send("에러가 발생했습니다.")
+        else res.redirect("/board_list");
+      });
+    }
+  });
+});
+
+function dtChg(d){
+  var dt = d.getFullYear() + "-";
+  dt += zeroPlus((d.getMonth() + 1)) + "-";
+  dt += zeroPlus(d.getDay()) + " ";
+  dt += zeroPlus(d.getHours()) + ":";
+  dt += zeroPlus(d.getMinutes()) + ":";
+  dt += zeroPlus(d.getSeconds());
+  return dt;
+}
+
+function zeroPlus(n) {
+  if(n<10) return "0"+n;
+  else return n;
+}
+
+app.get("/board_list", (req, res) => {
+  var sql = "SELECT * FROM sample ORDER BY id DESC";
+  db.conn.getConnection((err, connect) => {
+    if(err) res.send("에러가 발생했습니다.");
+    else {
+      connect.query(sql, (err, result) => {
+        if(err) res.send("에러가 발생했습니다.");
+        else {
+          // 2019-08-29 22:10:11
+          
+
+          var saveResult = [];
+          var tmp = {};
+          for(var v of result) {
+            tmp = {};
+            tmp.id = v.id;
+            tmp.comment = v.comment;
+            tmp.wdate = dtChg(new Date(v.wdate));
+            saveResult.push(tmp);
+          }
+          var sendData = {board: saveResult};
+          res.render("board_list", sendData);
+        }
+      });
+    }
+  });
 });
