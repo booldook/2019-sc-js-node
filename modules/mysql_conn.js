@@ -29,7 +29,21 @@ const conn = mysql.createPool({
 	queueLimit: 0
 });
 
+// async await
+// async function sqlExec() { - 함수선언문
+const sqlExec = async (sql, vals) => {
+  const connect = await conn.getConnection(async a => a);
+  const data = await connect.query(sql, vals);
+  connect.release();
+  return data;
+}
+const sqlError = data => {
+  console.log(data);
+}
+
 module.exports = {
 	mysql,
-	conn
+	conn,
+	sqlExec,
+	sqlError
 }

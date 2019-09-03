@@ -117,27 +117,17 @@ app.post("/board_save", (req, res) => {
 });
 */
 
-// async await
-// async function sqlExec() { - 함수선언문
-const sqlExec = async (sql, vals) => {
-  const connect = await db.conn.getConnection(async a => a);
-  const data = await connect.query(sql, vals);
-  connect.release();
-  return data;
-}
 app.post("/board_save", (req, res) => {
   const comment = req.body.comment;
   const sql = "INSERT INTO sample SET comment=?, wdate=?";
   const vals = [comment, util.dtChg(new Date())];
-  sqlExec(sql, vals).then(data => {
-    res.send(data);
-    //res.redirect("/board_list");
-  }).catch(data => {
-    res.send(data);
-  });
+  const success = data => {
+    res.redirect("/board_list");
+  };
+  db.sqlExec(sql, vals).then(success).catch(db.sqlError);
 });
 
-
+/*
 app.get("/board_list", (req, res) => {
   var sql = "SELECT * FROM sample ORDER BY id DESC";
   db.conn.getConnection((err, connect) => {
@@ -163,4 +153,23 @@ app.get("/board_list", (req, res) => {
       });
     }
   });
+});
+*/
+
+app.get("/board_list", (req, res) => {
+  const sql = "SELECT * FROM sample ORDER BY id DESC";
+  const success = (data) => {
+    var saveResult = [];
+    var tmp = {};
+    for(var v of data[0]) {
+      tmp = {};
+      tmp.id = v.id;
+      tmp.comment = v.comment;
+      tmp.wdate = util.dtChg(new Date(v.wdate));
+      saveResult.push(tmp);
+    }
+    var sendData = {board: saveResult};
+    res.render("board_list", sendData);
+  }
+  db.sqlExec(sql).then(success).catch(db.sqlError);
 });
