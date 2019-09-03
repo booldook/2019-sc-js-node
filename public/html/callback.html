@@ -1,0 +1,74 @@
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script>
+console.log("Hello");
+setTimeout(function () {
+  console.log("test");
+}, 0);
+
+console.log("World");
+console.clear();
+
+// 콜백의 문제점
+/*
+function getUser(url) {
+  var user = "A";
+  $.ajax({
+    url: url,
+    success: function(data){
+      user = data;
+      console.log(user);
+    }
+  });
+  return user;
+}
+var user = getUser("../json/user.json");
+console.log(user);
+*/
+function getUser(url, cb) {
+  var user = "A";
+  $.ajax({
+    url: url,
+    success: cb
+  });
+  return user;
+}
+getUser("../json/user.json", function(data) {console.log(data)});
+
+console.clear();
+
+// 콜백의 개선 - Promise()- ECMA2015(ES6) -IE안돈다.
+function getUser2(url) {
+  var user;
+  user = new Promise(function(resolve, reject) {
+    $.ajax({
+      url,
+      success: function(data) {
+        resolve(data);
+      },
+      error: function(err) {
+        reject(err);
+      }
+    });
+  });
+  return user;
+}
+getUser2("../json/user.json").then(function(data){
+  console.log(data);
+  console.clear();
+}).catch(function(err){
+  console.log(err);
+});
+
+// 콜백의 개선 - async/await - ECMA2007(ES8) - IE안되요
+async function getUser3(url) {
+  return await $.ajax(url);
+}
+
+getUser3("../json/user.json").then(success).catch(err);
+function success(data) {
+  console.log(data);
+}
+function err(data) {
+  console.log(data);
+}
+</script>

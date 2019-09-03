@@ -97,7 +97,8 @@ app.get("/include", (req, res) => {
   }
   res.render("include", sendValues);
 });
-
+/*
+// Callback 버전
 app.post("/board_save", (req, res) => {
   var comment = req.body.comment;
   var sql = "INSERT INTO sample SET comment=?, wdate=?";
@@ -107,12 +108,35 @@ app.post("/board_save", (req, res) => {
     if(err) res.send("접속이 실패했습니다.")
     else {
       connect.query(sql, values, (err, result) => {
+        connect.release();
         if(err) res.send("에러가 발생했습니다.")
         else res.redirect("/board_list");
       });
     }
   });
 });
+*/
+
+// async await
+// async function sqlExec() { - 함수선언문
+const sqlExec = async (sql, vals) => {
+  const connect = await db.conn.getConnection(async a => a);
+  const data = await connect.query(sql, vals);
+  connect.release();
+  return data;
+}
+app.post("/board_save", (req, res) => {
+  const comment = req.body.comment;
+  const sql = "INSERT INTO sample SET comment=?, wdate=?";
+  const vals = [comment, util.dtChg(new Date())];
+  sqlExec(sql, vals).then(data => {
+    res.send(data);
+    //res.redirect("/board_list");
+  }).catch(data => {
+    res.send(data);
+  });
+});
+
 
 app.get("/board_list", (req, res) => {
   var sql = "SELECT * FROM sample ORDER BY id DESC";
@@ -120,6 +144,7 @@ app.get("/board_list", (req, res) => {
     if(err) res.send("에러가 발생했습니다.");
     else {
       connect.query(sql, (err, result) => {
+        connect.release();
         if(err) res.send("에러가 발생했습니다.");
         else {
           // 2019-08-29 22:10:11
